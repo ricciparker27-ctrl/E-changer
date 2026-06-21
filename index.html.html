@@ -1,0 +1,1359 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#0A0A0F">
+<meta name="description" content="E-CHANGER – Sécurisez vos transactions au Cameroun">
+<title>E-CHANGER · Transactions Sécurisées Cameroun</title>
+<link rel="manifest" href="#" id="manifest-link">
+<style>
+:root {
+  --gold:#C9A84C; --gold-l:#E8C97A; --gold-d:#8B6914;
+  --green:#00C851; --orange:#FF6B00; --blue:#1A6BFF;
+  --purple:#7C3AED; --red:#FF4444;
+  --bg:#0A0A0F; --bg2:#12121A; --bg3:#1A1A28; --bg4:#22222F;
+  --border:rgba(201,168,76,0.18); --border2:rgba(201,168,76,0.35);
+  --muted:rgba(255,255,255,0.45); --mid:rgba(255,255,255,0.7);
+  --commission:7;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:#fff;font-size:14px}
+input,select,textarea,button{font-family:inherit}
+::-webkit-scrollbar{width:3px;height:3px}
+::-webkit-scrollbar-thumb{background:var(--gold-d);border-radius:2px}
+
+/* ─── LAYOUT ─────────────────────────────────────────── */
+#app{display:flex;flex-direction:column;height:100%;max-width:480px;margin:auto;position:relative;overflow:hidden}
+#content{flex:1;overflow-y:auto;overflow-x:hidden;scroll-behavior:smooth;padding-bottom:76px}
+
+/* ─── SPLASH ─────────────────────────────────────────── */
+#splash{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:9999;transition:opacity 0.6s}
+.splash-logo{width:80px;height:80px;background:linear-gradient(135deg,#8B6914,#C9A84C,#E8C97A);border-radius:24px;display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:900;color:#0A0A0F;animation:splashPulse 1.5s ease-in-out infinite alternate}
+@keyframes splashPulse{0%{box-shadow:0 0 20px rgba(201,168,76,0.3)}100%{box-shadow:0 0 60px rgba(201,168,76,0.7)}}
+.splash-name{font-size:32px;font-weight:900;background:linear-gradient(90deg,#C9A84C,#E8C97A,#C9A84C);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:3px}
+.splash-tag{font-size:12px;color:var(--muted);letter-spacing:2px}
+.splash-bar{width:200px;height:3px;background:var(--bg3);border-radius:2px;overflow:hidden;margin-top:24px}
+.splash-fill{height:100%;background:linear-gradient(90deg,#C9A84C,#E8C97A);border-radius:2px;width:0;transition:width 0.1s linear}
+
+/* ─── NAV ────────────────────────────────────────────── */
+#topnav{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:rgba(18,18,26,0.97);border-bottom:1px solid var(--border);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100}
+.logo-wrap{display:flex;align-items:center;gap:8px}
+.logo-box{width:30px;height:30px;background:linear-gradient(135deg,#C9A84C,#E8C97A);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;color:#0A0A0F}
+.logo-txt{font-size:17px;font-weight:800;background:linear-gradient(90deg,#C9A84C,#E8C97A);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.logo-sec{font-size:9px;background:#00C851;color:#0A0A0F;padding:1px 6px;border-radius:10px;font-weight:700}
+.nav-right{display:flex;align-items:center;gap:8px}
+.nav-btn{width:32px;height:32px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;font-size:14px}
+.nav-notif{width:7px;height:7px;background:#FF4444;border-radius:50%;position:absolute;top:5px;right:5px;border:1.5px solid var(--bg2);animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+.nav-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#3D2D00,#C9A84C);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;cursor:pointer;border:2px solid var(--gold-d)}
+
+/* ─── TABS ───────────────────────────────────────────── */
+#tabs{display:flex;background:var(--bg2);border-bottom:1px solid var(--border);overflow-x:auto;-ms-overflow-style:none;scrollbar-width:none}
+#tabs::-webkit-scrollbar{display:none}
+.tab{padding:10px 12px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all 0.2s;letter-spacing:0.3px}
+.tab.on{color:var(--gold);border-bottom-color:var(--gold)}
+
+/* ─── SCREENS ────────────────────────────────────────── */
+.screen{display:none;min-height:100%}
+.screen.on{display:block}
+
+/* ─── SECTION UTILS ──────────────────────────────────── */
+.sec{padding:14px}
+.sec-t{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px}
+.badge{padding:3px 8px;border-radius:20px;font-size:10px;font-weight:700;border:1px solid}
+.badge-g{background:rgba(0,200,81,0.1);color:#00C851;border-color:rgba(0,200,81,0.3)}
+.badge-o{background:rgba(255,107,0,0.1);color:#FF9500;border-color:rgba(255,107,0,0.3)}
+.badge-b{background:rgba(26,107,255,0.1);color:#5B9BFF;border-color:rgba(26,107,255,0.3)}
+.badge-gold{background:rgba(201,168,76,0.1);color:var(--gold-l);border-color:var(--border2)}
+.badge-r{background:rgba(255,68,68,0.1);color:#FF8888;border-color:rgba(255,68,68,0.3)}
+
+/* ─── HERO HOME ──────────────────────────────────────── */
+.hero{padding:16px;background:linear-gradient(180deg,rgba(201,168,76,0.08) 0%,transparent 100%);border-bottom:1px solid var(--border)}
+.bal-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:3px}
+.bal-amt{font-size:30px;font-weight:800;color:var(--gold-l)}
+.bal-sub{font-size:11px;color:var(--muted);margin-top:1px}
+.hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.hbtn{padding:12px;border-radius:12px;border:none;cursor:pointer;font-size:12px;font-weight:700;display:flex;align-items:center;gap:7px;transition:transform 0.15s}
+.hbtn:active{transform:scale(0.97)}
+.hbtn-p{background:linear-gradient(135deg,#C9A84C,#E8C97A);color:#0A0A0F}
+.hbtn-s{background:var(--bg3);color:var(--gold-l);border:1px solid var(--border)}
+
+/* ─── STATS STRIP ────────────────────────────────────── */
+.stats-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;padding:10px 14px}
+.stat{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:10px 8px;text-align:center}
+.stat-n{font-size:20px;font-weight:800;color:var(--gold-l)}
+.stat-l{font-size:9px;color:var(--muted);margin-top:1px}
+
+/* ─── FLOW STEPS ─────────────────────────────────────── */
+.steps{display:flex;padding:10px 14px 4px;gap:0}
+.step{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;position:relative}
+.step:not(:last-child)::after{content:'';position:absolute;top:11px;left:50%;right:-50%;height:2px;background:var(--border);z-index:0}
+.step.done::after{background:var(--gold)}
+.step-c{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;z-index:1;position:relative;border:2px solid}
+.step-c.done{background:var(--gold);border-color:var(--gold);color:#0A0A0F}
+.step-c.act{background:var(--bg2);border-color:var(--gold);color:var(--gold);animation:stepPulse 1.5s infinite}
+@keyframes stepPulse{0%,100%{box-shadow:0 0 0 0 rgba(201,168,76,0.5)}50%{box-shadow:0 0 0 5px rgba(201,168,76,0)}}
+.step-c.off{background:var(--bg2);border-color:var(--border);color:var(--muted)}
+.step-l{font-size:8px;color:var(--muted);text-align:center;line-height:1.2}
+.step-l.done{color:var(--gold)}
+
+/* ─── TX CARD ────────────────────────────────────────── */
+.txcard{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:13px;margin-bottom:9px;cursor:pointer;transition:border-color 0.2s}
+.txcard:active{border-color:var(--border2)}
+.txcard-h{display:flex;justify-content:space-between;align-items:flex-start}
+.txcard-id{font-size:9px;color:var(--muted);margin-bottom:2px}
+.txcard-name{font-size:13px;font-weight:700}
+.txcard-amt{font-size:15px;font-weight:800;color:var(--gold-l)}
+.txcard-meta{display:flex;align-items:center;gap:6px;margin-top:7px;flex-wrap:wrap}
+.pbar{height:3px;background:var(--bg3);border-radius:2px;margin-top:8px;overflow:hidden}
+.pfill{height:100%;border-radius:2px;background:linear-gradient(90deg,#C9A84C,#E8C97A);transition:width 1s}
+
+/* ─── AGENTS SCREEN ──────────────────────────────────── */
+.agents-header{padding:14px;background:linear-gradient(135deg,rgba(10,10,15,0.8),rgba(26,18,0,0.8));border-bottom:1px solid var(--border)}
+.live-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.live-badge{display:flex;align-items:center;gap:5px;background:rgba(255,68,68,0.1);border:1px solid rgba(255,68,68,0.25);padding:3px 9px;border-radius:20px;font-size:10px;color:#FF8888}
+.live-dot{width:6px;height:6px;background:#FF4444;border-radius:50%;animation:blink 1s infinite}
+
+/* ─── OFFICE ─────────────────────────────────────────── */
+#office{position:relative;height:340px;background:var(--bg2);border:1px solid var(--border);border-radius:14px;margin:10px 14px;overflow:hidden}
+.office-bg{position:absolute;inset:0;background:
+  linear-gradient(rgba(201,168,76,0.03) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(201,168,76,0.03) 1px,transparent 1px);
+  background-size:28px 28px}
+.desk{position:absolute;background:var(--bg3);border:1px solid var(--border);border-radius:10px;display:flex;flex-direction:column;align-items:center;padding:8px 6px 6px;cursor:pointer;transition:border-color 0.3s;min-width:70px}
+.desk:hover,.desk.busy{border-color:var(--border2)}
+.desk-screen{width:44px;height:28px;background:#0D1B2A;border-radius:4px;border:1px solid rgba(201,168,76,0.2);margin-bottom:5px;position:relative;overflow:hidden}
+.screen-content{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.screen-lines{width:100%;padding:3px}
+.sline{height:2px;background:rgba(201,168,76,0.4);border-radius:1px;margin:2px 3px;animation:lineAnim 2s infinite}
+.sline:nth-child(2){animation-delay:0.3s;width:70%}
+.sline:nth-child(3){animation-delay:0.6s;width:50%}
+@keyframes lineAnim{0%,100%{opacity:0.3}50%{opacity:1}}
+.desk-top{width:48px;height:4px;background:var(--bg4);border-radius:2px;margin-bottom:6px}
+
+/* ─── AGENT AVATAR ───────────────────────────────────── */
+.agent-wrap{position:absolute;display:flex;flex-direction:column;align-items:center;gap:3px;transition:left 1.5s cubic-bezier(.4,0,.2,1),top 1.5s cubic-bezier(.4,0,.2,1);z-index:10;cursor:pointer}
+.av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;position:relative;border:2px solid;transition:box-shadow 0.3s}
+.av.active{animation:agentBob 2s ease-in-out infinite}
+@keyframes agentBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.av-dot{position:absolute;bottom:0;right:0;width:10px;height:10px;border-radius:50%;border:2px solid var(--bg2)}
+.av-dot.on{background:#00C851}
+.av-dot.busy{background:#FF6B00;animation:blink 0.8s infinite}
+.av-label{font-size:8px;font-weight:700;white-space:nowrap;background:rgba(10,10,15,0.85);padding:1px 5px;border-radius:4px;backdrop-filter:blur(4px)}
+.speech{position:absolute;bottom:calc(100% + 4px);left:50%;transform:translateX(-50%);background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:4px 7px;font-size:9px;white-space:nowrap;max-width:130px;white-space:normal;text-align:center;line-height:1.3;opacity:0;pointer-events:none;transition:opacity 0.3s;z-index:20}
+.speech.show{opacity:1}
+.speech::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:4px solid transparent;border-top-color:var(--bg3)}
+
+/* ─── MESSAGE BUBBLE anim ────────────────────────────── */
+.msg-bubble{position:absolute;background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.3);border-radius:8px;padding:3px 6px;font-size:8px;color:var(--gold-l);pointer-events:none;animation:floatMsg 3s ease-out forwards}
+@keyframes floatMsg{0%{opacity:0;transform:translateY(0)}20%{opacity:1}80%{opacity:1}100%{opacity:0;transform:translateY(-30px)}}
+
+/* ─── ACTIVITY LOG ───────────────────────────────────── */
+.log-box{margin:0 14px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;max-height:200px;overflow-y:auto}
+.log-head{padding:8px 12px;background:var(--bg3);border-bottom:1px solid var(--border);font-size:10px;font-weight:700;color:var(--muted);display:flex;align-items:center;gap:6px;position:sticky;top:0}
+.log-e{padding:7px 12px;border-bottom:1px solid rgba(255,255,255,0.03);font-size:10px;color:var(--mid);display:flex;gap:7px;align-items:flex-start;animation:logSlide 0.3s ease}
+@keyframes logSlide{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.log-t{font-size:9px;font-weight:700;color:var(--gold);flex-shrink:0;min-width:34px}
+.log-dot{width:5px;height:5px;border-radius:50%;margin-top:3px;flex-shrink:0}
+
+/* ─── MAP SCREEN ─────────────────────────────────────── */
+#map-container{margin:12px 14px;border-radius:14px;overflow:hidden;border:1px solid var(--border)}
+.map-head{padding:10px 13px;background:var(--bg2);border-bottom:1px solid var(--border);font-size:12px;font-weight:700;color:var(--gold-l);display:flex;align-items:center;gap:7px}
+#mapCanvas{background:#0D1B2A;height:260px;position:relative;overflow:hidden}
+.map-grid-bg{position:absolute;inset:0;background-image:linear-gradient(rgba(201,168,76,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(201,168,76,0.04) 1px,transparent 1px);background-size:25px 25px}
+.city-pin{position:absolute;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer}
+.pin-dot{width:11px;height:11px;border-radius:50%;border:2px solid;position:relative}
+.pin-dot::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:1px solid;opacity:0;animation:ripple 2.5s infinite}
+@keyframes ripple{0%{opacity:0.5;transform:scale(0.5)}100%{opacity:0;transform:scale(2)}}
+.pin-lbl{font-size:8px;font-weight:700;background:rgba(10,10,15,0.8);padding:1px 5px;border-radius:3px;white-space:nowrap}
+.moving-pkg{position:absolute;width:9px;height:9px;background:var(--gold);border-radius:50%;box-shadow:0 0 10px rgba(201,168,76,0.8);z-index:10;transition:left 4s linear,top 4s linear}
+#userLocDot{position:absolute;width:14px;height:14px;z-index:20;display:none}
+#userLocDot::before{content:'';position:absolute;inset:0;background:#1A6BFF;border-radius:50%;border:2px solid #fff}
+#userLocDot::after{content:'';position:absolute;inset:-5px;border-radius:50%;border:2px solid rgba(26,107,255,0.4);animation:ripple 2s infinite}
+.map-leg{display:flex;gap:10px;padding:7px 13px;background:var(--bg2);font-size:9px;color:var(--muted);flex-wrap:wrap}
+.leg-i{display:flex;align-items:center;gap:4px}
+.leg-d{width:7px;height:7px;border-radius:50%}
+
+/* ─── PAYMENT SCREEN ─────────────────────────────────── */
+.pm-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:15px;margin-bottom:11px}
+.pm-logo-row{display:flex;align-items:center;gap:10px;margin-bottom:13px}
+.pm-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;flex-shrink:0}
+.pm-icon.om{background:#FF6B00;color:#fff}
+.pm-icon.mtn{background:#FFCC00;color:#0A0A0F}
+.pm-name{font-size:14px;font-weight:800}
+.pm-sub{font-size:10px;color:var(--muted)}
+.inp{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:11px 13px;color:#fff;font-size:13px;outline:none;margin-bottom:8px;transition:border-color 0.2s}
+.inp:focus{border-color:var(--border2)}
+.inp::placeholder{color:var(--muted);font-size:12px}
+.breakdown{background:var(--bg3);border-radius:10px;padding:11px 13px;margin-bottom:8px;border:1px solid rgba(201,168,76,0.1)}
+.brow{display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px;color:var(--mid)}
+.brow.total{border-top:1px solid var(--border);padding-top:7px;margin-top:3px;font-weight:800;font-size:13px;color:#fff}
+.brow.commission{color:var(--gold)}
+.paybtn{width:100%;padding:13px;border-radius:12px;border:none;cursor:pointer;font-size:13px;font-weight:800;transition:transform 0.15s,opacity 0.15s}
+.paybtn:active{transform:scale(0.98)}
+.paybtn.om{background:linear-gradient(135deg,#FF6B00,#FF9500);color:#fff}
+.paybtn.mtn{background:linear-gradient(135deg,#FFCC00,#FFE066);color:#0A0A0F}
+.sec-note{display:flex;align-items:flex-start;gap:8px;background:rgba(0,200,81,0.06);border:1px solid rgba(0,200,81,0.15);border-radius:10px;padding:10px 12px;margin-top:8px}
+.sec-note p{font-size:10px;color:rgba(0,200,81,0.85);line-height:1.5}
+
+/* ─── NEW TX SCREEN ──────────────────────────────────── */
+.new-step{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px}
+.new-step-t{font-size:11px;font-weight:700;color:var(--gold);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.how-step{display:flex;gap:10px;align-items:flex-start;margin-bottom:10px}
+.how-n{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#C9A84C,#E8C97A);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#0A0A0F;flex-shrink:0}
+.how-t{font-size:11px;color:var(--mid);line-height:1.5}
+.how-t b{color:var(--gold)}
+.bigbtn{width:100%;padding:14px;border-radius:14px;border:none;cursor:pointer;font-size:14px;font-weight:800;background:linear-gradient(135deg,#C9A84C,#E8C97A);color:#0A0A0F;letter-spacing:0.3px;transition:transform 0.15s,box-shadow 0.2s}
+.bigbtn:active{transform:scale(0.98)}
+.bigbtn:hover{box-shadow:0 4px 24px rgba(201,168,76,0.4)}
+
+/* ─── HISTORY SCREEN ─────────────────────────────────── */
+.hist-card{background:var(--bg2);border:1px solid var(--border);border-radius:13px;padding:12px;margin-bottom:8px}
+.hist-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.hist-id{font-size:9px;color:var(--muted)}
+.hist-msg{font-size:10px;color:var(--mid);background:var(--bg3);border-radius:7px;padding:7px 9px;line-height:1.5;border-left:2px solid var(--gold-d)}
+.hist-time{font-size:9px;color:var(--muted);margin-top:5px;text-align:right}
+.retention-note{background:rgba(201,168,76,0.06);border:1px solid var(--border);border-radius:10px;padding:9px 12px;font-size:10px;color:var(--muted);text-align:center;margin-bottom:10px}
+
+/* ─── CONTACT SCREEN ─────────────────────────────────── */
+.ticket-card{background:var(--bg2);border:1px solid var(--border);border-radius:13px;padding:13px;margin-bottom:8px}
+.ticket-num{font-size:9px;color:var(--muted);margin-bottom:3px}
+.ticket-title{font-size:13px;font-weight:700;margin-bottom:5px}
+.ticket-meta{display:flex;gap:8px;align-items:center}
+
+/* ─── BOTTOM NAV ─────────────────────────────────────── */
+#bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:rgba(18,18,26,0.97);border-top:1px solid var(--border);display:flex;backdrop-filter:blur(12px);z-index:100;padding-bottom:env(safe-area-inset-bottom)}
+.bni{flex:1;padding:9px 4px 7px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer}
+.bni-ic{font-size:18px;color:var(--muted);transition:color 0.2s}
+.bni-lb{font-size:8px;color:var(--muted);font-weight:600;transition:color 0.2s}
+.bni.on .bni-ic,.bni.on .bni-lb{color:var(--gold)}
+.bni-fab{flex:0;padding:0 8px;display:flex;align-items:center}
+.fab{width:46px;height:46px;background:linear-gradient(135deg,#C9A84C,#E8C97A);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 20px rgba(201,168,76,0.4);margin-bottom:3px;cursor:pointer;transition:transform 0.15s}
+.fab:active{transform:scale(0.95)}
+
+/* ─── TOAST ──────────────────────────────────────────── */
+#toast{position:fixed;bottom:88px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--bg3);border:1px solid var(--border2);color:var(--gold-l);padding:9px 16px;border-radius:12px;font-size:12px;font-weight:700;opacity:0;transition:all 0.3s;z-index:999;white-space:nowrap;pointer-events:none;max-width:90vw;text-align:center}
+
+/* ─── MODAL ──────────────────────────────────────────── */
+#modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:none;z-index:200;align-items:flex-end;justify-content:center;max-width:480px;margin:auto}
+#modal-bg.show{display:flex}
+#modal{background:var(--bg2);border:1px solid var(--border);border-radius:20px 20px 0 0;padding:20px;width:100%;max-height:85vh;overflow-y:auto;animation:slideUp 0.3s ease}
+@keyframes slideUp{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+.modal-title{font-size:16px;font-weight:800;color:var(--gold-l);margin-bottom:4px}
+.modal-sub{font-size:11px;color:var(--muted);margin-bottom:16px}
+.modal-close{position:absolute;right:20px;top:20px;font-size:20px;cursor:pointer;color:var(--muted)}
+.conf-row{display:flex;justify-content:space-between;font-size:12px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);color:var(--mid)}
+.conf-row.big{font-size:15px;font-weight:800;color:#fff;border:none;padding-top:10px}
+.conf-row.comm{color:var(--gold)}
+
+/* ─── TYPING ─────────────────────────────────────────── */
+.typing{display:inline-flex;gap:3px;vertical-align:middle}
+.typing span{width:4px;height:4px;border-radius:50%;background:var(--gold);animation:bounce 1.2s infinite}
+.typing span:nth-child(2){animation-delay:0.2s}
+.typing span:nth-child(3){animation-delay:0.4s}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+
+/* ─── GPS PULSE (user location) ──────────────────────── */
+@keyframes gpsRipple{0%{box-shadow:0 0 0 0 rgba(26,107,255,0.6)}100%{box-shadow:0 0 0 20px rgba(26,107,255,0)}}
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="splash-logo">E</div>
+  <div class="splash-name">E-CHANGER</div>
+  <div class="splash-tag">PLATEFORME SÉCURISÉE · CAMEROUN</div>
+  <div style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;justify-content:center">
+    <span style="font-size:10px;color:var(--muted)">🤖 5 Agents IA actifs</span>
+    <span style="font-size:10px;color:var(--muted)">🔒 Escrow AES-256</span>
+    <span style="font-size:10px;color:var(--muted)">📍 GPS temps réel</span>
+  </div>
+  <div class="splash-bar"><div class="splash-fill" id="sbar"></div></div>
+  <div style="font-size:10px;color:var(--muted);margin-top:8px" id="stext">Initialisation des agents IA…</div>
+</div>
+
+<!-- APP -->
+<div id="app">
+
+  <!-- TOP NAV -->
+  <div id="topnav">
+    <div class="logo-wrap">
+      <div class="logo-box">E</div>
+      <span class="logo-txt">E-CHANGER</span>
+      <span class="logo-sec">SECURE</span>
+    </div>
+    <div class="nav-right">
+      <div class="nav-btn" onclick="showScreen('contact')">
+        <span>💬</span>
+        <div class="nav-notif"></div>
+      </div>
+      <div class="nav-avatar" onclick="showProfile()">JD</div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div id="tabs">
+    <div class="tab on" onclick="showScreen('home')">🏠 Accueil</div>
+    <div class="tab" onclick="showScreen('agents')">🤖 Agents IA</div>
+    <div class="tab" onclick="showScreen('geo')">📍 GPS Live</div>
+    <div class="tab" onclick="showScreen('payment')">💳 Paiement</div>
+    <div class="tab" onclick="showScreen('history')">📋 Historique</div>
+    <div class="tab" onclick="showScreen('contact')">📞 Support</div>
+  </div>
+
+  <!-- CONTENT -->
+  <div id="content">
+
+    <!-- ══ HOME ══════════════════════════════════════════ -->
+    <div class="screen on" id="s-home">
+      <div class="hero">
+        <div class="bal-label">Fonds sécurisés en escrow</div>
+        <div class="bal-amt" id="home-bal">285 500 FCFA</div>
+        <div class="bal-sub">3 transactions actives · Commission plateforme: <b style="color:var(--gold)">7%</b></div>
+        <div class="hero-grid">
+          <button class="hbtn hbtn-p" onclick="showScreen('new')">➕ Nouvelle transaction</button>
+          <button class="hbtn hbtn-s" onclick="showScreen('payment')">💳 Déposer fonds</button>
+        </div>
+      </div>
+
+      <div class="stats-strip">
+        <div class="stat"><div class="stat-n" id="stat-active">3</div><div class="stat-l">En cours</div></div>
+        <div class="stat"><div class="stat-n" id="stat-done">12</div><div class="stat-l">Complètes</div></div>
+        <div class="stat"><div class="stat-n">0</div><div class="stat-l">Litiges</div></div>
+      </div>
+
+      <div class="steps">
+        <div class="step done"><div class="step-c done">✓</div><div class="step-l done">Accord</div></div>
+        <div class="step done"><div class="step-c done">✓</div><div class="step-l done">Dépôt</div></div>
+        <div class="step"><div class="step-c act">3</div><div class="step-l" style="color:var(--gold)">Expédition</div></div>
+        <div class="step"><div class="step-c off">4</div><div class="step-l">Livraison</div></div>
+        <div class="step"><div class="step-c off">5</div><div class="step-l">Libération</div></div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-t">Transactions en cours</div>
+
+        <div class="txcard" onclick="openTx('TXN-20241','Samsung A54','85000','Douala','Yaoundé','Ali Moussa','En transit',65)">
+          <div class="txcard-h">
+            <div><div class="txcard-id">#TXN-20241 · il y a 2h</div><div class="txcard-name">Téléphone Samsung A54</div></div>
+            <div class="txcard-amt">85 000 FCFA</div>
+          </div>
+          <div class="txcard-meta">
+            <span class="badge badge-b">📦 En transit</span>
+            <span style="font-size:10px;color:var(--muted)">🏙 Douala → Yaoundé</span>
+          </div>
+          <div class="pbar"><div class="pfill" style="width:65%"></div></div>
+        </div>
+
+        <div class="txcard" onclick="openTx('TXN-20240','Tissus Ankara 10m','45000','Bafoussam','Douala','Fatou K.','Fonds sécurisés',40)">
+          <div class="txcard-h">
+            <div><div class="txcard-id">#TXN-20240 · il y a 5h</div><div class="txcard-name">Tissus Ankara 10m</div></div>
+            <div class="txcard-amt">45 000 FCFA</div>
+          </div>
+          <div class="txcard-meta">
+            <span class="badge badge-g">🔒 Fonds sécurisés</span>
+            <span style="font-size:10px;color:var(--muted)">🏙 Bafoussam → Douala</span>
+          </div>
+          <div class="pbar"><div class="pfill" style="width:40%"></div></div>
+        </div>
+
+        <div class="txcard" onclick="openTx('TXN-20235','Ordinateur HP 15s','155500','Ngaoundéré','Yaoundé','Martin B.','Complète',100)">
+          <div class="txcard-h">
+            <div><div class="txcard-id">#TXN-20235 · hier</div><div class="txcard-name">Ordinateur HP 15s</div></div>
+            <div class="txcard-amt">155 500 FCFA</div>
+          </div>
+          <div class="txcard-meta">
+            <span class="badge badge-gold">✅ Complète</span>
+            <span style="font-size:10px;color:var(--muted)">🏙 Ngaoundéré → Yaoundé</span>
+          </div>
+          <div class="pbar"><div class="pfill" style="width:100%"></div></div>
+        </div>
+      </div>
+
+      <!-- MINI AGENT STATUS -->
+      <div class="sec" style="padding-top:0">
+        <div class="sec-t">Agents actifs maintenant</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div class="card" style="padding:10px;display:flex;align-items:center;gap:8px;cursor:pointer" onclick="showScreen('agents')">
+            <div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#2A1F00,#3D2D00);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:var(--gold-l);position:relative">R<div class="av-dot busy"></div></div>
+            <div><div style="font-size:11px;font-weight:700">Ricci</div><div class="typing" style="margin-top:2px"><span></span><span></span><span></span></div></div>
+          </div>
+          <div class="card" style="padding:10px;display:flex;align-items:center;gap:8px;cursor:pointer" onclick="showScreen('agents')">
+            <div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#001A1A,#002A2A);border:2px solid #00C8C8;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#00E5E5;position:relative">C<div class="av-dot on"></div></div>
+            <div><div style="font-size:11px;font-weight:700">Cynthia</div><div style="font-size:9px;color:#00C851">● Calcul en cours</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ AGENTS ════════════════════════════════════════ -->
+    <div class="screen" id="s-agents">
+      <div class="agents-header">
+        <div class="live-row">
+          <div style="font-size:15px;font-weight:800;color:var(--gold-l)">🏢 QG E-CHANGER — Bureau 24/7</div>
+          <div class="live-badge"><div class="live-dot"></div>DIRECT</div>
+        </div>
+        <div style="font-size:11px;color:var(--muted)">5 agents IA · Traitement en temps réel de vos transactions</div>
+      </div>
+
+      <!-- OFFICE ANIMATION -->
+      <div id="office">
+        <div class="office-bg"></div>
+
+        <!-- Desks -->
+        <div class="desk" style="left:10px;top:20px;width:75px" id="desk-ricci">
+          <div class="desk-top"></div>
+          <div class="desk-screen"><div class="screen-content"><div class="screen-lines"><div class="sline"></div><div class="sline"></div><div class="sline"></div></div></div></div>
+          <div style="font-size:7px;color:var(--muted)">MANAGER</div>
+        </div>
+        <div class="desk" style="left:110px;top:20px;width:70px" id="desk-cynthia">
+          <div class="desk-top"></div>
+          <div class="desk-screen"><div class="screen-content"><div class="screen-lines"><div class="sline"></div><div class="sline"></div><div class="sline"></div></div></div></div>
+          <div style="font-size:7px;color:var(--muted)">CALCULS</div>
+        </div>
+        <div class="desk" style="left:200px;top:20px;width:70px" id="desk-chouckette">
+          <div class="desk-top"></div>
+          <div class="desk-screen"><div class="screen-content"><div class="screen-lines"><div class="sline"></div><div class="sline"></div><div class="sline"></div></div></div></div>
+          <div style="font-size:7px;color:var(--muted)">ÉCHANGES</div>
+        </div>
+        <div class="desk" style="left:110px;top:190px;width:70px" id="desk-bianka">
+          <div class="desk-top"></div>
+          <div class="desk-screen"><div class="screen-content"><div class="screen-lines"><div class="sline"></div><div class="sline"></div><div class="sline"></div></div></div></div>
+          <div style="font-size:7px;color:var(--muted)">CLIENTS</div>
+        </div>
+        <div class="desk" style="left:200px;top:190px;width:70px" id="desk-ada">
+          <div class="desk-top"></div>
+          <div class="desk-screen"><div class="screen-content"><div class="screen-lines"><div class="sline"></div><div class="sline"></div><div class="sline"></div></div></div></div>
+          <div style="font-size:7px;color:var(--muted)">SÉCURITÉ</div>
+        </div>
+
+        <!-- Meeting table -->
+        <div style="position:absolute;left:15px;top:155px;width:80px;height:28px;background:var(--bg4);border-radius:14px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:8px;color:var(--muted)">TABLE RÉUNION</div>
+
+        <!-- Agents -->
+        <div class="agent-wrap" id="ag-ricci" style="left:12px;top:80px" onclick="agentClick('ricci')">
+          <div class="av active" style="background:linear-gradient(135deg,#2A1F00,#3D2D00);border-color:var(--gold)">R<div class="av-dot busy"></div></div>
+          <div class="av-label" style="color:var(--gold-l)">👔 Ricci</div>
+          <div class="speech" id="sp-ricci">Approbation #TXN-20241 en cours…</div>
+        </div>
+
+        <div class="agent-wrap" id="ag-cynthia" style="left:112px;top:80px" onclick="agentClick('cynthia')">
+          <div class="av active" style="background:linear-gradient(135deg,#001A1A,#002A2A);border-color:#00C8C8">C<div class="av-dot on"></div></div>
+          <div class="av-label" style="color:#00E5E5">💰 Cynthia</div>
+          <div class="speech" id="sp-cynthia">7% × 85 000 = 5 950 FCFA</div>
+        </div>
+
+        <div class="agent-wrap" id="ag-chouckette" style="left:202px;top:80px" onclick="agentClick('chouckette')">
+          <div class="av active" style="background:linear-gradient(135deg,#1A0020,#2A003A);border-color:#C84BFF">Ch<div class="av-dot busy"></div></div>
+          <div class="av-label" style="color:#D880FF">🔄 Chouckette</div>
+          <div class="speech" id="sp-chouckette">Coordination Dla→Ydé active</div>
+        </div>
+
+        <div class="agent-wrap" id="ag-bianka" style="left:112px;top:250px" onclick="agentClick('bianka')">
+          <div class="av active" style="background:linear-gradient(135deg,#001A00,#002800);border-color:#00C851">B<div class="av-dot on"></div></div>
+          <div class="av-label" style="color:#4DFF90">📲 Bianka</div>
+          <div class="speech" id="sp-bianka">Notif envoyée à Jean D.</div>
+        </div>
+
+        <div class="agent-wrap" id="ag-ada" style="left:202px;top:250px" onclick="agentClick('ada')">
+          <div class="av active" style="background:linear-gradient(135deg,#00001A,#000030);border-color:#1A6BFF">A<div class="av-dot on"></div></div>
+          <div class="av-label" style="color:#5B9BFF">🔒 Ada</div>
+          <div class="speech" id="sp-ada">Escrow verrouillé · AES-256</div>
+        </div>
+
+        <!-- Connection lines SVG -->
+        <svg style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none" id="office-svg">
+          <defs><marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="rgba(201,168,76,0.6)" stroke-width="1.5"/></marker></defs>
+          <line id="conn1" x1="50" y1="110" x2="148" y2="110" stroke="rgba(201,168,76,0.2)" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+          <line id="conn2" x1="148" y1="110" x2="240" y2="110" stroke="rgba(0,200,81,0.2)" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+          <line id="conn3" x1="148" y1="120" x2="148" y2="250" stroke="rgba(201,168,76,0.15)" stroke-width="1" stroke-dasharray="4,3"/>
+          <line id="conn4" x1="240" y1="120" x2="240" y2="250" stroke="rgba(26,107,255,0.15)" stroke-width="1" stroke-dasharray="4,3"/>
+        </svg>
+      </div>
+
+      <!-- Agent cards -->
+      <div class="sec" style="padding-top:8px">
+        <div class="sec-t">Détail des missions</div>
+        <div id="agent-cards"></div>
+      </div>
+
+      <!-- Log -->
+      <div class="log-box" id="activity-log">
+        <div class="log-head"><div class="live-dot"></div>Journal d'activité temps réel</div>
+        <div id="log-entries"></div>
+      </div>
+      <div style="height:10px"></div>
+    </div>
+
+    <!-- ══ GEO ════════════════════════════════════════════ -->
+    <div class="screen" id="s-geo">
+      <div style="padding:13px 14px 6px">
+        <div style="font-size:15px;font-weight:800;color:var(--gold-l);margin-bottom:3px">📍 Géolocalisation GPS</div>
+        <div style="font-size:11px;color:var(--muted)">Suivi en temps réel des transactions E-CHANGER au Cameroun</div>
+      </div>
+
+      <div style="padding:0 14px 10px;display:flex;gap:8px;flex-wrap:wrap">
+        <button onclick="activateGPS()" style="padding:7px 13px;border-radius:10px;background:linear-gradient(135deg,#1A3A6B,#1A6BFF);border:none;color:#fff;font-size:11px;font-weight:700;cursor:pointer">📍 Activer ma position GPS</button>
+        <button onclick="deactivateGPS()" style="padding:7px 13px;border-radius:10px;background:var(--bg3);border:1px solid var(--border);color:var(--muted);font-size:11px;font-weight:700;cursor:pointer">⏹ Désactiver GPS</button>
+      </div>
+
+      <div id="map-container">
+        <div class="map-head">🗺 Réseau E-CHANGER Cameroun
+          <span class="badge badge-g" style="margin-left:auto;font-size:9px">● LIVE</span>
+        </div>
+        <div id="mapCanvas">
+          <div class="map-grid-bg"></div>
+          <svg style="position:absolute;inset:0;width:100%;height:260px" viewBox="0 0 340 260" preserveAspectRatio="none">
+            <path d="M110,15 L180,10 L240,25 L275,60 L285,100 L270,140 L245,180 L210,210 L170,218 L135,210 L105,185 L85,155 L78,120 L85,85 L95,50 Z" fill="rgba(201,168,76,0.05)" stroke="rgba(201,168,76,0.2)" stroke-width="1.5"/>
+            <!-- Routes -->
+            <line x1="120" y1="145" x2="190" y2="95" stroke="rgba(201,168,76,0.3)" stroke-width="1.5" stroke-dasharray="6,3"/>
+            <line x1="150" y1="60" x2="120" y2="145" stroke="rgba(0,200,81,0.3)" stroke-width="1.5" stroke-dasharray="6,3"/>
+            <line x1="220" y1="110" x2="190" y2="95" stroke="rgba(26,107,255,0.25)" stroke-width="1" stroke-dasharray="4,3"/>
+            <line x1="255" y1="130" x2="190" y2="95" stroke="rgba(255,107,0,0.2)" stroke-width="1" stroke-dasharray="4,3"/>
+          </svg>
+          <div class="moving-pkg" id="pkg1" style="left:36%;top:55%"></div>
+          <div class="moving-pkg" id="pkg2" style="left:44%;top:22%;background:#00C851;box-shadow:0 0 8px rgba(0,200,81,0.8)"></div>
+          <div id="userLocDot" style="left:54%;top:35%"></div>
+          <!-- City pins -->
+          <div class="city-pin" style="left:54%;top:35%"><div class="pin-dot" style="background:#C9A84C;border-color:#E8C97A"><div style="position:absolute;inset:-4px;border-radius:50%;border:1px solid rgba(201,168,76,0.4);animation:ripple 2s infinite"></div></div><div class="pin-lbl" style="color:var(--gold)">★ YAOUNDÉ</div></div>
+          <div class="city-pin" style="left:33%;top:56%"><div class="pin-dot" style="background:#00C851;border-color:#4DFF90"><div style="position:absolute;inset:-4px;border-radius:50%;border:1px solid rgba(0,200,81,0.4);animation:ripple 2.3s infinite"></div></div><div class="pin-lbl" style="color:#4DFF90">DOUALA</div></div>
+          <div class="city-pin" style="left:41%;top:23%"><div class="pin-dot" style="background:#1A6BFF;border-color:#5B9BFF"></div><div class="pin-lbl" style="color:#5B9BFF">BAFOUSSAM</div></div>
+          <div class="city-pin" style="left:62%;top:15%"><div class="pin-dot" style="background:#C84BFF;border-color:#D880FF"></div><div class="pin-lbl" style="color:#D880FF">NGAOUNDÉRÉ</div></div>
+          <div class="city-pin" style="left:70%;top:47%"><div class="pin-dot" style="background:#FF6B00;border-color:#FF9500"></div><div class="pin-lbl" style="color:#FF9500">BERTOUA</div></div>
+          <div class="city-pin" style="left:56%;top:72%"><div class="pin-dot" style="background:#FF4444;border-color:#FF8888"></div><div class="pin-lbl" style="color:#FF8888">EBOLOWA</div></div>
+        </div>
+        <div class="map-leg">
+          <div class="leg-i"><div class="leg-d" style="background:var(--gold)"></div>Yaoundé QG</div>
+          <div class="leg-i"><div class="leg-d" style="background:#00C851"></div>Tx active</div>
+          <div class="leg-i"><div class="leg-d" style="background:#1A6BFF"></div>Votre position</div>
+          <div class="leg-i"><div class="leg-d" style="background:var(--gold);animation:blink 1s infinite"></div>Colis</div>
+        </div>
+      </div>
+
+      <!-- TX suivi -->
+      <div class="sec" style="padding-top:8px">
+        <div class="sec-t">Suivi GPS #TXN-20241</div>
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:9px">
+            <div style="font-size:13px;font-weight:700">📱 Samsung A54</div>
+            <span class="badge badge-b">En transit</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:10px">
+            <div style="background:var(--bg3);border-radius:9px;padding:9px">
+              <div style="font-size:9px;color:var(--muted);margin-bottom:2px">📍 Départ</div>
+              <div style="font-size:12px;font-weight:700;color:#4DFF90">Douala</div>
+              <div style="font-size:9px;color:var(--muted)">Ali Moussa · 694XXXXXX</div>
+            </div>
+            <div style="background:var(--bg3);border-radius:9px;padding:9px">
+              <div style="font-size:9px;color:var(--muted);margin-bottom:2px">📍 Destination</div>
+              <div style="font-size:12px;font-weight:700;color:var(--gold)">Yaoundé</div>
+              <div style="font-size:9px;color:var(--muted)">Jean D. · 670XXXXXX</div>
+            </div>
+          </div>
+          <div style="font-size:10px;color:var(--muted);margin-bottom:3px">Progression (6h estimées)</div>
+          <div class="pbar"><div class="pfill" id="geo-pbar" style="width:65%"></div></div>
+          <div style="display:flex;justify-content:space-between;margin-top:3px;font-size:9px;color:var(--muted)">
+            <span>Expédié 14h20</span><span id="geo-eta">Arrivée est. 20h20</span>
+          </div>
+          <div style="margin-top:9px;background:rgba(0,200,81,0.06);border:1px solid rgba(0,200,81,0.12);border-radius:8px;padding:7px 10px;font-size:10px;color:rgba(0,200,81,0.85)">
+            🔒 85 000 FCFA bloqués · Libération automatique à confirmation de réception
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PAYMENT ════════════════════════════════════════ -->
+    <div class="screen" id="s-payment">
+      <div style="padding:13px 14px 6px">
+        <div style="font-size:15px;font-weight:800;color:var(--gold-l);margin-bottom:2px">💳 Paiement sécurisé</div>
+        <div style="font-size:11px;color:var(--muted)">Commission plateforme: <b style="color:var(--gold)">7%</b> · Fonds en escrow AES-256</div>
+      </div>
+
+      <div style="padding:0 14px 14px">
+        <!-- ORANGE MONEY -->
+        <div class="pm-card">
+          <div class="pm-logo-row">
+            <div class="pm-icon om">OM</div>
+            <div>
+              <div class="pm-name">Orange Money</div>
+              <div class="pm-sub">+237 670 36 40 78</div>
+            </div>
+            <span class="badge badge-g" style="margin-left:auto">✓ Actif</span>
+          </div>
+          <input class="inp" id="om-phone" type="tel" placeholder="Votre N° Orange Money (6XXXXXXXX)" oninput="calcOM()">
+          <input class="inp" id="om-amount" type="number" placeholder="Montant en FCFA" oninput="calcOM()">
+          <div class="breakdown" id="om-break" style="display:none">
+            <div class="brow"><span>Montant déposé</span><span id="om-dep">—</span></div>
+            <div class="brow commission"><span>Commission E-CHANGER (7%)</span><span id="om-comm">—</span></div>
+            <div class="brow"><span>Montant crédité vendeur</span><span id="om-net">—</span></div>
+            <div class="brow total"><span>Total débité</span><span id="om-total">—</span></div>
+          </div>
+          <button class="paybtn om" onclick="confirmPay('Orange Money','om')">🟠 Payer via Orange Money</button>
+        </div>
+
+        <!-- MTN -->
+        <div class="pm-card">
+          <div class="pm-logo-row">
+            <div class="pm-icon mtn">MTN</div>
+            <div>
+              <div class="pm-name">MTN Mobile Money</div>
+              <div class="pm-sub">+237 694 97 89 15</div>
+            </div>
+            <span class="badge badge-g" style="margin-left:auto">✓ Actif</span>
+          </div>
+          <input class="inp" id="mtn-phone" type="tel" placeholder="Votre N° MTN MoMo (6XXXXXXXX)" oninput="calcMTN()">
+          <input class="inp" id="mtn-amount" type="number" placeholder="Montant en FCFA" oninput="calcMTN()">
+          <div class="breakdown" id="mtn-break" style="display:none">
+            <div class="brow"><span>Montant déposé</span><span id="mtn-dep">—</span></div>
+            <div class="brow commission"><span>Commission E-CHANGER (7%)</span><span id="mtn-comm">—</span></div>
+            <div class="brow"><span>Montant crédité vendeur</span><span id="mtn-net">—</span></div>
+            <div class="brow total"><span>Total débité</span><span id="mtn-total">—</span></div>
+          </div>
+          <button class="paybtn mtn" onclick="confirmPay('MTN Mobile Money','mtn')">🟡 Payer via MTN MoMo</button>
+        </div>
+
+        <div class="sec-note">
+          <span style="font-size:18px;flex-shrink:0">🔒</span>
+          <p>Vos fonds sont placés en escrow chiffré. Le vendeur ne reçoit son argent qu'après votre confirmation de réception. Commission de 7% prélevée automatiquement. Remboursement garanti en cas de litige. Messages de confirmation conservés 1 mois.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ NEW TX ══════════════════════════════════════════ -->
+    <div class="screen" id="s-new">
+      <div style="padding:13px 14px 6px">
+        <div style="font-size:15px;font-weight:800;color:var(--gold-l);margin-bottom:2px">➕ Nouvelle transaction</div>
+        <div style="font-size:11px;color:var(--muted)">Sécurisez votre achat en quelques secondes</div>
+      </div>
+      <div style="padding:0 14px 14px">
+        <div class="new-step">
+          <div class="new-step-t">📦 Informations marchandise</div>
+          <input class="inp" id="new-desc" type="text" placeholder="Description de la marchandise">
+          <input class="inp" id="new-amount" type="number" placeholder="Montant en FCFA" oninput="calcNew()">
+          <div class="breakdown" id="new-break" style="display:none">
+            <div class="brow"><span>Montant</span><span id="new-dep">—</span></div>
+            <div class="brow commission"><span>Commission 7%</span><span id="new-comm">—</span></div>
+            <div class="brow"><span>Vendeur recevra</span><span id="new-net">—</span></div>
+            <div class="brow total"><span>Vous payez</span><span id="new-total">—</span></div>
+          </div>
+        </div>
+        <div class="new-step">
+          <div class="new-step-t">📍 Localisation</div>
+          <input class="inp" id="new-from" type="text" placeholder="Ville du vendeur (ex: Douala)">
+          <input class="inp" id="new-to" type="text" placeholder="Votre ville (ex: Yaoundé)">
+        </div>
+        <div class="new-step">
+          <div class="new-step-t">📞 Contact vendeur</div>
+          <input class="inp" id="new-seller" type="text" placeholder="Nom du vendeur">
+          <input class="inp" id="new-seller-phone" type="tel" placeholder="N° téléphone vendeur">
+          <select class="inp" id="new-payment" style="cursor:pointer;color:#fff">
+            <option value="" style="background:var(--bg3);color:var(--muted)">Mode de paiement…</option>
+            <option value="om" style="background:var(--bg3)">🟠 Orange Money</option>
+            <option value="mtn" style="background:var(--bg3)">🟡 MTN Mobile Money</option>
+          </select>
+          <input class="inp" id="new-my-phone" type="tel" placeholder="Votre numéro de paiement">
+        </div>
+        <div class="new-step" style="background:var(--bg3);border-color:rgba(201,168,76,0.08)">
+          <div class="new-step-t" style="color:var(--muted)">ℹ Comment ça marche</div>
+          <div class="how-step"><div class="how-n">1</div><div class="how-t">Vous créez la transaction · <b>Fonds bloqués en escrow</b></div></div>
+          <div class="how-step"><div class="how-n">2</div><div class="how-t">Vendeur reçoit notification et expédie la marchandise</div></div>
+          <div class="how-step"><div class="how-n">3</div><div class="how-t">Il envoie preuve d'expédition → <b>Nos agents vérifient</b></div></div>
+          <div class="how-step"><div class="how-n" style="background:var(--bg4);color:var(--green);border:1px solid var(--green)">4</div><div class="how-t">Vous confirmez réception → <b style="color:#00C851">Paiement libéré au vendeur</b></div></div>
+        </div>
+        <button class="bigbtn" onclick="createTx()">🔒 Créer la transaction sécurisée</button>
+      </div>
+    </div>
+
+    <!-- ══ HISTORY ════════════════════════════════════════ -->
+    <div class="screen" id="s-history">
+      <div style="padding:13px 14px 6px">
+        <div style="font-size:15px;font-weight:800;color:var(--gold-l);margin-bottom:2px">📋 Historique & Confirmations</div>
+        <div style="font-size:11px;color:var(--muted)">Messages conservés 1 mois · Archivage sécurisé E-CHANGER</div>
+      </div>
+      <div style="padding:0 14px 14px">
+        <div class="retention-note">🗃 Conservation des confirmations: <b style="color:var(--gold)">30 jours</b> · Purge automatique sécurisée après expiration</div>
+        <div id="history-list"></div>
+      </div>
+    </div>
+
+    <!-- ══ CONTACT ════════════════════════════════════════ -->
+    <div class="screen" id="s-contact">
+      <div style="padding:13px 14px 6px">
+        <div style="font-size:15px;font-weight:800;color:var(--gold-l);margin-bottom:2px">📞 Support E-CHANGER</div>
+        <div style="font-size:11px;color:var(--muted)">Assistance, réclamations, suggestions</div>
+      </div>
+      <div style="padding:0 14px 14px">
+        <div class="card">
+          <div class="sec-t">Nouveau ticket</div>
+          <select class="inp" id="ticket-type" style="cursor:pointer;color:#fff">
+            <option style="background:var(--bg3)">Assistance générale</option>
+            <option style="background:var(--bg3)">Problème de paiement</option>
+            <option style="background:var(--bg3)">Transaction bloquée</option>
+            <option style="background:var(--bg3)">Litige vendeur/acheteur</option>
+            <option style="background:var(--bg3)">Suggestion d'amélioration</option>
+          </select>
+          <input class="inp" id="ticket-name" type="text" placeholder="Votre nom">
+          <input class="inp" id="ticket-phone" type="tel" placeholder="Votre numéro">
+          <textarea class="inp" id="ticket-msg" placeholder="Décrivez votre demande en détail…" style="resize:none;min-height:80px;line-height:1.5"></textarea>
+          <button class="bigbtn" onclick="submitTicket()">📨 Envoyer le ticket</button>
+        </div>
+
+        <div class="sec-t" style="margin-top:4px">Contacts directs</div>
+        <div class="card">
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="width:34px;height:34px;background:rgba(255,107,0,0.15);border:1px solid rgba(255,107,0,0.3);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px">📱</div>
+              <div><div style="font-size:12px;font-weight:700">Orange Money</div><div style="font-size:11px;color:var(--gold)">+237 670 36 40 78</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="width:34px;height:34px;background:rgba(255,204,0,0.12);border:1px solid rgba(255,204,0,0.2);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px">📱</div>
+              <div><div style="font-size:12px;font-weight:700">MTN Mobile Money</div><div style="font-size:11px;color:var(--gold)">+237 694 97 89 15</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="width:34px;height:34px;background:rgba(37,211,102,0.12);border:1px solid rgba(37,211,102,0.2);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px">💬</div>
+              <div><div style="font-size:12px;font-weight:700">WhatsApp Support</div><div style="font-size:11px;color:#00C851">Disponible 24h/24</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sec-t">Tickets en cours</div>
+        <div id="ticket-list"></div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+
+  <!-- BOTTOM NAV -->
+  <div id="bnav">
+    <div class="bni on" onclick="showScreen('home')"><div class="bni-ic">🏠</div><div class="bni-lb">Accueil</div></div>
+    <div class="bni" onclick="showScreen('agents')"><div class="bni-ic">🤖</div><div class="bni-lb">Agents</div></div>
+    <div class="bni-fab"><div class="fab" onclick="showScreen('new')">➕</div></div>
+    <div class="bni" onclick="showScreen('geo')"><div class="bni-ic">📍</div><div class="bni-lb">GPS</div></div>
+    <div class="bni" onclick="showScreen('history')"><div class="bni-ic">📋</div><div class="bni-lb">Historique</div></div>
+  </div>
+
+</div><!-- /app -->
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- MODAL -->
+<div id="modal-bg" onclick="closeModal(event)">
+  <div id="modal" style="position:relative">
+    <div class="modal-close" onclick="closeModal()">✕</div>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// DATA & STATE
+// ═══════════════════════════════════════════════════════
+const COMMISSION = 7;
+let currentScreen = 'home';
+let gpsActive = false;
+let agentPositions = {};
+
+const AGENTS = [
+  {id:'ricci',name:'Ricci',emoji:'👔',role:'Manager Général',spec:'Supervision, approbation finale, gestion des litiges',color:'#C9A84C',avColor:'linear-gradient(135deg,#2A1F00,#3D2D00)',borderColor:'#C9A84C',
+   tasks:['Supervision de 3 tx actives','Approbation décisions critiques','Validation finale des libérations fonds']},
+  {id:'cynthia',name:'Cynthia',emoji:'💰',role:'Analyste Financière',spec:'Calculs des commissions 7%, bilans, rapports comptables',color:'#00E5E5',avColor:'linear-gradient(135deg,#001A1A,#002A2A)',borderColor:'#00C8C8',
+   tasks:['Calcul: 7% × 85000 = 5950 FCFA','Bilan journalier: 285 500 FCFA sécurisés','Rapport mensuel en préparation']},
+  {id:'chouckette',name:'Chouckette',emoji:'🔄',role:'Coordinatrice Échanges',spec:'Organisation des transferts, coordination vendeur/acheteur',color:'#D880FF',avColor:'linear-gradient(135deg,#1A0020,#2A003A)',borderColor:'#C84BFF',
+   tasks:['Coordination Douala→Yaoundé active','Vérification preuve expédition #TXN-20241','Contact transporteur MTN Express']},
+  {id:'bianka',name:'Bianka',emoji:'📲',role:'Chargée de Communication',spec:'Notifications clients, SMS, suivi satisfaction',color:'#4DFF90',avColor:'linear-gradient(135deg,#001A00,#002800)',borderColor:'#00C851',
+   tasks:['Notif envoyée à Jean D. ✓','SMS vendeur Ali Moussa ✓','3 alertes email traitées aujourd\'hui']},
+  {id:'ada',name:'Ada',emoji:'🔒',role:'Responsable Sécurité',spec:'Escrow AES-256, anti-fraude, audit, libérations sécurisées',color:'#5B9BFF',avColor:'linear-gradient(135deg,#00001A,#000030)',borderColor:'#1A6BFF',
+   tasks:['Escrow verrouillé · 3 tx · AES-256','Aucune anomalie détectée','Sauvegardes automatiques OK']},
+];
+
+const AGENT_MSGS = {
+  ricci:['Approbation #TXN-20241 en cours…','Transaction validée ✓','Surveillance 24h/24 active','Rapport journalier en préparation'],
+  cynthia:['7% × 85 000 = 5 950 FCFA','Calcul commission validé ✓','Bilan: +285 500 FCFA sécurisés','Rapport comptable à 18h00'],
+  chouckette:['Coordination Dla→Ydé active','Preuve expédition reçue ✓','Contact transporteur confirmé','Trajet estimé: 6h restantes'],
+  bianka:['Notif envoyée à Jean D.','SMS confirmation expédié ✓','Acheteur informé du statut','3 clients mis à jour'],
+  ada:['Escrow verrouillé · AES-256','Aucune fraude détectée 🛡','Fonds sécurisés · Verrou actif','Audit sécurité: OK ✓'],
+};
+
+const AGENT_MOVES = [
+  {id:'ricci',positions:[{l:12,t:80},{l:12,t:155},{l:12,t:80},{l:65,t:155},{l:12,t:80}]},
+  {id:'cynthia',positions:[{l:112,t:80},{l:112,t:155},{l:62,t:115},{l:112,t:80},{l:162,t:80}]},
+  {id:'chouckette',positions:[{l:202,t:80},{l:152,t:120},{l:202,t:80},{l:250,t:155},{l:202,t:80}]},
+  {id:'bianka',positions:[{l:112,t:250},{l:112,t:185},{l:62,t:155},{l:112,t:250},{l:162,t:250}]},
+  {id:'ada',positions:[{l:202,t:250},{l:202,t:185},{l:252,t:155},{l:202,t:250},{l:152,t:250}]},
+];
+
+const LOG_MSGS = [
+  {agent:'Ricci',color:'#C9A84C',msg:'a approuvé la transaction #TXN-20241'},
+  {agent:'Cynthia',color:'#00E5E5',msg:'a calculé 5 950 FCFA de commission (7%)'},
+  {agent:'Chouckette',color:'#D880FF',msg:'a coordonné l\'expédition Douala→Yaoundé'},
+  {agent:'Bianka',color:'#4DFF90',msg:'a notifié l\'acheteur Jean D. par SMS'},
+  {agent:'Ada',color:'#5B9BFF',msg:'confirme escrow sécurisé AES-256 actif'},
+  {agent:'Cynthia',color:'#00E5E5',msg:'a mis à jour le bilan: 285 500 FCFA escrow'},
+  {agent:'Chouckette',color:'#D880FF',msg:'a reçu preuve d\'expédition MTN Express'},
+  {agent:'Bianka',color:'#4DFF90',msg:'a informé le vendeur de la vérification'},
+  {agent:'Ada',color:'#5B9BFF',msg:'a détecté 0 anomalie — sécurité maximale'},
+  {agent:'Ricci',color:'#C9A84C',msg:'rapport journalier: 12 tx complètes · 0 litige'},
+];
+
+let logIndex = 0;
+let moveIndexes = {ricci:0,cynthia:0,chouckette:0,bianka:0,ada:0};
+
+const HISTORY_MESSAGES = [
+  {id:'#TXN-20241',item:'Samsung A54',amount:85000,from:'Douala',to:'Yaoundé',status:'En transit',date:'17/06/2026 14:20',msg:'✅ CONFIRMATION E-CHANGER\n\nTransaction #TXN-20241 créée et sécurisée.\nMontant déposé: 85 000 FCFA\nCommission (7%): 5 950 FCFA\nMontant vendeur: 79 050 FCFA\nFonds en escrow AES-256.\nLibération à confirmation réception.\nAgent superviseur: Ricci',expires:'17/07/2026'},
+  {id:'#TXN-20240',item:'Tissus Ankara 10m',amount:45000,from:'Bafoussam',to:'Douala',status:'Fonds sécurisés',date:'17/06/2026 09:05',msg:'✅ CONFIRMATION E-CHANGER\n\nTransaction #TXN-20240 créée et sécurisée.\nMontant déposé: 45 000 FCFA\nCommission (7%): 3 150 FCFA\nMontant vendeur: 41 850 FCFA\nFonds en escrow AES-256.\nAttente expédition vendeur.\nAgent superviseur: Ricci',expires:'17/07/2026'},
+  {id:'#TXN-20235',item:'Ordinateur HP 15s',amount:155500,from:'Ngaoundéré',to:'Yaoundé',status:'Complète ✅',date:'16/06/2026 11:30',msg:'✅ LIBÉRATION E-CHANGER\n\nTransaction #TXN-20235 COMPLÈTE.\nMontant libéré: 144 615 FCFA → vendeur\nCommission perçue: 10 885 FCFA\nTransaction confirmée par les deux parties.\nAgent superviseur: Ricci\nSécurité validée par: Ada',expires:'16/07/2026'},
+];
+
+const TICKETS = [
+  {num:'#TKT-4521',type:'Assistance générale',status:'En cours',time:'il y a 2h',agent:'Bianka'},
+  {num:'#TKT-4499',type:'Suggestion',status:'Résolu ✓',time:'hier',agent:'Chouckette'},
+];
+
+// ═══════════════════════════════════════════════════════
+// SPLASH
+// ═══════════════════════════════════════════════════════
+const smsgs = ['Initialisation des agents IA…','Connexion serveur sécurisé…','Chargement Orange Money & MTN…','Activation escrow AES-256…','Bienvenue sur E-CHANGER ✓'];
+let sp = 0;
+const sbar = document.getElementById('sbar');
+const stext = document.getElementById('stext');
+
+function runSplash() {
+  let pct = 0;
+  const iv = setInterval(() => {
+    pct += 2;
+    sbar.style.width = pct + '%';
+    if(pct % 20 === 0 && sp < smsgs.length) stext.textContent = smsgs[sp++];
+    if(pct >= 100) {
+      clearInterval(iv);
+      setTimeout(() => {
+        const s = document.getElementById('splash');
+        s.style.opacity = '0';
+        s.style.pointerEvents = 'none';
+        setTimeout(() => s.remove(), 600);
+        initApp();
+      }, 400);
+    }
+  }, 28);
+}
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+function initApp() {
+  buildAgentCards();
+  buildHistory();
+  buildTickets();
+  initLog();
+  startAgentMovement();
+  startLogStream();
+  startSpeechCycle();
+  startPackageAnim();
+  showToast('🤖 5 agents IA actifs · E-CHANGER opérationnel');
+}
+
+// ═══════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  document.querySelectorAll('.bni').forEach(b => b.classList.remove('on'));
+  const s = document.getElementById('s-' + id);
+  if(s) s.classList.add('on');
+  const tabMap = {home:0,agents:1,geo:2,payment:3,history:4,contact:5};
+  const tabs = document.querySelectorAll('.tab');
+  if(tabMap[id] !== undefined) tabs[tabMap[id]]?.classList.add('on');
+  const navMap = {home:0,agents:1,new:2,geo:3,history:4};
+  if(navMap[id] !== undefined) {
+    const bnis = document.querySelectorAll('.bni');
+    bnis[navMap[id]]?.classList.add('on');
+  }
+  currentScreen = id;
+  document.getElementById('content').scrollTo(0,0);
+}
+
+// ═══════════════════════════════════════════════════════
+// AGENT CARDS
+// ═══════════════════════════════════════════════════════
+function buildAgentCards() {
+  const c = document.getElementById('agent-cards');
+  c.innerHTML = AGENTS.map(a => `
+    <div class="card" style="border-color:rgba(${hexToRgb(a.borderColor)},0.3);margin-bottom:9px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:9px">
+        <div style="width:42px;height:42px;border-radius:50%;background:${a.avColor};border:2px solid ${a.borderColor};display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;color:${a.color};position:relative;flex-shrink:0">
+          ${a.name[0]}
+          <div class="av-dot ${a.id==='ricci'||a.id==='chouckette'?'busy':'on'}"></div>
+        </div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:800;color:${a.color}">${a.emoji} ${a.name}</div>
+          <div style="font-size:10px;color:var(--muted);margin-bottom:4px">${a.role}</div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.6)">${a.spec}</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        ${a.tasks.map(t=>`<div style="background:var(--bg3);border-radius:7px;padding:5px 9px;font-size:10px;color:rgba(255,255,255,0.65);border-left:2px solid ${a.borderColor}">▸ ${t}</div>`).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function hexToRgb(h) {
+  const r = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(h);
+  return r ? `${parseInt(r[1],16)},${parseInt(r[2],16)},${parseInt(r[3],16)}` : '201,168,76';
+}
+
+// ═══════════════════════════════════════════════════════
+// AGENT MOVEMENT
+// ═══════════════════════════════════════════════════════
+function startAgentMovement() {
+  AGENT_MOVES.forEach(am => {
+    moveAgent(am.id);
+    setInterval(() => moveAgent(am.id), 4000 + Math.random()*3000);
+  });
+}
+
+function moveAgent(id) {
+  const el = document.getElementById('ag-' + id);
+  if(!el) return;
+  const moves = AGENT_MOVES.find(a=>a.id===id).positions;
+  moveIndexes[id] = (moveIndexes[id]+1) % moves.length;
+  const pos = moves[moveIndexes[id]];
+  el.style.left = pos.l + 'px';
+  el.style.top = pos.t + 'px';
+  // Show speech briefly
+  const sp = document.getElementById('sp-' + id);
+  if(sp) {
+    sp.classList.add('show');
+    setTimeout(() => sp.classList.remove('show'), 2500);
+  }
+  // Floating message
+  if(Math.random() > 0.5) spawnMessage(id);
+}
+
+function spawnMessage(agentId) {
+  const office = document.getElementById('office');
+  if(!office) return;
+  const ag = document.getElementById('ag-' + agentId);
+  if(!ag) return;
+  const agent = AGENTS.find(a=>a.id===agentId);
+  if(!agent) return;
+  const msgs = AGENT_MSGS[agentId];
+  const msg = msgs[Math.floor(Math.random()*msgs.length)];
+  const el = document.createElement('div');
+  el.className = 'msg-bubble';
+  const rect = ag.getBoundingClientRect();
+  const offRect = office.getBoundingClientRect();
+  el.style.left = (parseInt(ag.style.left)+10) + 'px';
+  el.style.top = (parseInt(ag.style.top)-10) + 'px';
+  el.style.color = agent.color;
+  el.style.borderColor = agent.borderColor;
+  el.style.background = `rgba(${hexToRgb(agent.color)},0.08)`;
+  el.textContent = msg;
+  office.appendChild(el);
+  setTimeout(() => el.remove(), 3100);
+}
+
+// ═══════════════════════════════════════════════════════
+// SPEECH CYCLE
+// ═══════════════════════════════════════════════════════
+function startSpeechCycle() {
+  AGENTS.forEach((ag, i) => {
+    setInterval(() => {
+      const sp = document.getElementById('sp-' + ag.id);
+      if(!sp) return;
+      const msgs = AGENT_MSGS[ag.id];
+      sp.textContent = msgs[Math.floor(Math.random()*msgs.length)];
+      sp.classList.add('show');
+      setTimeout(() => sp.classList.remove('show'), 2800);
+    }, 5000 + i*900);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// LOG STREAM
+// ═══════════════════════════════════════════════════════
+function initLog() {
+  const c = document.getElementById('log-entries');
+  c.innerHTML = '';
+  LOG_MSGS.slice(0,4).forEach(m => appendLog(m, false));
+}
+
+function appendLog(m, animate=true) {
+  const c = document.getElementById('log-entries');
+  if(!c) return;
+  const now = new Date();
+  const t = now.getHours()+':'+String(now.getMinutes()).padStart(2,'0');
+  const div = document.createElement('div');
+  div.className = 'log-e';
+  div.innerHTML = `<span class="log-t">${t}</span><div class="log-dot" style="background:${m.color}"></div><span><b style="color:rgba(255,255,255,0.9)">${m.agent}</b> ${m.msg}</span>`;
+  c.insertBefore(div, c.firstChild);
+  while(c.children.length > 12) c.removeChild(c.lastChild);
+}
+
+function startLogStream() {
+  setInterval(() => {
+    const m = LOG_MSGS[logIndex % LOG_MSGS.length];
+    appendLog(m);
+    logIndex++;
+  }, 3500);
+}
+
+// ═══════════════════════════════════════════════════════
+// PACKAGE ANIMATION (map)
+// ═══════════════════════════════════════════════════════
+function startPackageAnim() {
+  const pkg1 = document.getElementById('pkg1');
+  const pkg2 = document.getElementById('pkg2');
+  if(!pkg1||!pkg2) return;
+  function movePkg() {
+    const routes = [
+      [{l:33,t:55},{l:54,t:35}],
+      [{l:41,t:23},{l:33,t:55}],
+      [{l:62,t:15},{l:54,t:35}],
+    ];
+    const r = routes[Math.floor(Math.random()*routes.length)];
+    pkg1.style.left = r[0].l+'%'; pkg1.style.top = r[0].t+'%';
+    setTimeout(() => { pkg1.style.left = r[1].l+'%'; pkg1.style.top = r[1].t+'%'; }, 100);
+  }
+  function movePkg2() {
+    const pos = [{l:41,t:23},{l:54,t:35},{l:33,t:55},{l:41,t:23}];
+    let i = 0;
+    setInterval(() => {
+      const p = pos[i%pos.length];
+      pkg2.style.left = p.l+'%'; pkg2.style.top = p.t+'%';
+      i++;
+    }, 4500);
+  }
+  movePkg(); movePkg2();
+  setInterval(movePkg, 5000);
+}
+
+// ═══════════════════════════════════════════════════════
+// HISTORY
+// ═══════════════════════════════════════════════════════
+function buildHistory() {
+  const c = document.getElementById('history-list');
+  c.innerHTML = HISTORY_MESSAGES.map(h => `
+    <div class="hist-card">
+      <div class="hist-h">
+        <div>
+          <div class="hist-id">${h.id}</div>
+          <div style="font-size:12px;font-weight:700">${h.item}</div>
+        </div>
+        <span class="badge ${h.status.includes('Complète')?'badge-gold':h.status.includes('transit')?'badge-b':'badge-g'}">${h.status}</span>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin:5px 0 7px">${h.from} → ${h.to} · ${h.amount.toLocaleString('fr-FR')} FCFA</div>
+      <div class="hist-msg">${h.msg.replace(/\n/g,'<br>')}</div>
+      <div class="hist-time">⏱ ${h.date} · Expiration: ${h.expires}</div>
+    </div>
+  `).join('');
+}
+
+function buildTickets() {
+  const c = document.getElementById('ticket-list');
+  c.innerHTML = TICKETS.map(t => `
+    <div class="ticket-card">
+      <div class="ticket-num">${t.num}</div>
+      <div class="ticket-title">${t.type}</div>
+      <div class="ticket-meta">
+        <span class="badge ${t.status.includes('cours')?'badge-o':'badge-g'}">${t.status}</span>
+        <span style="font-size:10px;color:var(--muted)">${t.time}</span>
+        <span style="font-size:10px;color:var(--muted)">Agent: ${t.agent}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// PAYMENT CALC
+// ═══════════════════════════════════════════════════════
+function calcBreakdown(amount, prefix) {
+  const b = document.getElementById(prefix+'-break');
+  if(!amount || amount <= 0) { b.style.display='none'; return; }
+  const comm = Math.round(amount * COMMISSION / 100);
+  const net = amount - comm;
+  b.style.display = 'block';
+  document.getElementById(prefix+'-dep').textContent = fmt(amount);
+  document.getElementById(prefix+'-comm').textContent = '- ' + fmt(comm);
+  document.getElementById(prefix+'-net').textContent = fmt(net);
+  document.getElementById(prefix+'-total').textContent = fmt(amount);
+}
+function calcOM() { calcBreakdown(parseFloat(document.getElementById('om-amount').value)||0, 'om'); }
+function calcMTN() { calcBreakdown(parseFloat(document.getElementById('mtn-amount').value)||0, 'mtn'); }
+function calcNew() { calcBreakdown(parseFloat(document.getElementById('new-amount').value)||0, 'new'); }
+function fmt(n) { return n.toLocaleString('fr-FR') + ' FCFA'; }
+
+// ═══════════════════════════════════════════════════════
+// PAYMENT CONFIRM
+// ═══════════════════════════════════════════════════════
+function confirmPay(method, prefix) {
+  const amount = parseFloat(document.getElementById(prefix+'-amount').value)||0;
+  const phone = document.getElementById(prefix+'-phone').value;
+  if(!amount||!phone) { showToast('⚠️ Renseignez le numéro et le montant'); return; }
+  const comm = Math.round(amount * COMMISSION / 100);
+  const net = amount - comm;
+  showModal(`
+    <div class="modal-title">Confirmation de paiement</div>
+    <div class="modal-sub">Vérifiez les détails avant de confirmer</div>
+    <div class="conf-row"><span>Mode</span><span style="font-weight:700">${method}</span></div>
+    <div class="conf-row"><span>Votre numéro</span><span>${phone}</span></div>
+    <div class="conf-row"><span>Montant déposé</span><span>${fmt(amount)}</span></div>
+    <div class="conf-row commission"><span>Commission E-CHANGER (7%)</span><span style="color:var(--gold)">- ${fmt(comm)}</span></div>
+    <div class="conf-row"><span>Vendeur recevra</span><span style="color:#00C851">${fmt(net)}</span></div>
+    <div class="conf-row big"><span>TOTAL DÉBITÉ</span><span style="color:var(--gold-l)">${fmt(amount)}</span></div>
+    <div style="background:rgba(201,168,76,0.07);border:1px solid var(--border);border-radius:10px;padding:10px;margin:12px 0;font-size:11px;color:var(--mid);line-height:1.5">
+      🔒 En confirmant, vous acceptez que vos fonds soient placés en escrow sécurisé E-CHANGER jusqu'à confirmation de réception de votre commande.
+    </div>
+    <button class="bigbtn" onclick="executePay('${method}','${amount}','${comm}','${net}')" style="font-size:13px;padding:12px">✅ Confirmer le dépôt en escrow</button>
+    <button onclick="closeModal()" style="width:100%;padding:11px;border-radius:12px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;margin-top:8px">Annuler</button>
+  `);
+}
+
+function executePay(method, amount, comm, net) {
+  closeModal();
+  showToast('⏳ Traitement en cours via ' + method + '…');
+  setTimeout(() => {
+    const txId = '#TXN-' + (20250 + Math.floor(Math.random()*100));
+    const now = new Date();
+    const dateStr = `${String(now.getDate()).padStart(2,'0')}/${String(now.getMonth()+1).padStart(2,'0')}/${now.getFullYear()} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    const expDate = new Date(now.getTime() + 30*24*60*60*1000);
+    const expStr = `${String(expDate.getDate()).padStart(2,'0')}/${String(expDate.getMonth()+1).padStart(2,'0')}/${expDate.getFullYear()}`;
+    const msg = `✅ CONFIRMATION E-CHANGER\n\nTransaction ${txId} créée et sécurisée.\nMontant déposé: ${parseFloat(amount).toLocaleString('fr-FR')} FCFA\nCommission (7%): ${parseFloat(comm).toLocaleString('fr-FR')} FCFA\nMontant crédité vendeur: ${parseFloat(net).toLocaleString('fr-FR')} FCFA\nFonds en escrow AES-256.\nLibération à confirmation réception.\nAgent superviseur: Ricci`;
+    HISTORY_MESSAGES.unshift({id:txId,item:'Nouveau paiement',amount:parseFloat(amount),from:'—',to:'—',status:'Fonds sécurisés',date:dateStr,msg:msg,expires:expStr});
+    buildHistory();
+    showToast('✅ Fonds sécurisés en escrow · ' + txId);
+    appendLog({agent:'Ada',color:'#5B9BFF',msg:`a sécurisé ${parseFloat(amount).toLocaleString('fr-FR')} FCFA pour ${txId}`});
+    appendLog({agent:'Cynthia',color:'#00E5E5',msg:`a prélevé commission: ${parseFloat(comm).toLocaleString('fr-FR')} FCFA`});
+    appendLog({agent:'Bianka',color:'#4DFF90',msg:`a envoyé confirmation ${txId} au client`});
+  }, 2000);
+}
+
+// ═══════════════════════════════════════════════════════
+// NEW TX
+// ═══════════════════════════════════════════════════════
+function createTx() {
+  const desc = document.getElementById('new-desc').value;
+  const amount = parseFloat(document.getElementById('new-amount').value)||0;
+  const from = document.getElementById('new-from').value;
+  const to = document.getElementById('new-to').value;
+  const seller = document.getElementById('new-seller').value;
+  const sellerPhone = document.getElementById('new-seller-phone').value;
+  const payment = document.getElementById('new-payment').value;
+  const myPhone = document.getElementById('new-my-phone').value;
+  if(!desc||!amount||!from||!to||!seller||!sellerPhone||!payment||!myPhone) {
+    showToast('⚠️ Veuillez remplir tous les champs'); return;
+  }
+  const method = payment==='om'?'Orange Money':'MTN Mobile Money';
+  const comm = Math.round(amount*COMMISSION/100);
+  const net = amount-comm;
+  showModal(`
+    <div class="modal-title">📦 Récapitulatif transaction</div>
+    <div class="modal-sub">Confirmez les détails pour sécuriser votre achat</div>
+    <div class="conf-row"><span>Article</span><span style="font-weight:700">${desc}</span></div>
+    <div class="conf-row"><span>Itinéraire</span><span>${from} → ${to}</span></div>
+    <div class="conf-row"><span>Vendeur</span><span>${seller} · ${sellerPhone}</span></div>
+    <div class="conf-row"><span>Paiement</span><span>${method}</span></div>
+    <div class="conf-row"><span>Montant</span><span>${fmt(amount)}</span></div>
+    <div class="conf-row commission"><span>Commission E-CHANGER (7%)</span><span style="color:var(--gold)">- ${fmt(comm)}</span></div>
+    <div class="conf-row"><span>Vendeur recevra</span><span style="color:#00C851">${fmt(net)}</span></div>
+    <div class="conf-row big"><span>VOUS PAYEZ</span><span style="color:var(--gold-l)">${fmt(amount)}</span></div>
+    <div style="background:rgba(0,200,81,0.06);border:1px solid rgba(0,200,81,0.15);border-radius:10px;padding:9px;margin:12px 0;font-size:10px;color:rgba(0,200,81,0.8);line-height:1.5">
+      🛡 Fonds bloqués jusqu'à votre confirmation de réception · Remboursement garanti si problème
+    </div>
+    <button class="bigbtn" onclick="executeTx('${desc}','${amount}','${comm}','${net}','${from}','${to}','${seller}','${method}')" style="font-size:13px;padding:12px">🔒 Sécuriser la transaction</button>
+    <button onclick="closeModal()" style="width:100%;padding:11px;border-radius:12px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;margin-top:8px">Modifier</button>
+  `);
+}
+
+function executeTx(desc, amount, comm, net, from, to, seller, method) {
+  closeModal();
+  const txId = '#TXN-' + (20260 + Math.floor(Math.random()*100));
+  const now = new Date();
+  const dateStr = `${String(now.getDate()).padStart(2,'0')}/${String(now.getMonth()+1).padStart(2,'0')}/${now.getFullYear()} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  const expDate = new Date(now.getTime() + 30*24*60*60*1000);
+  const expStr = `${String(expDate.getDate()).padStart(2,'0')}/${String(expDate.getMonth()+1).padStart(2,'0')}/${expDate.getFullYear()}`;
+  const msgStr = `✅ CONFIRMATION E-CHANGER\n\nTransaction ${txId} créée et sécurisée.\nArticle: ${desc}\nTrajet: ${from} → ${to}\nVendeur: ${seller}\nMode: ${method}\nMontant déposé: ${parseFloat(amount).toLocaleString('fr-FR')} FCFA\nCommission (7%): ${parseFloat(comm).toLocaleString('fr-FR')} FCFA\nVendeur recevra: ${parseFloat(net).toLocaleString('fr-FR')} FCFA\nFonds en escrow AES-256.\nAgent superviseur: Ricci`;
+  HISTORY_MESSAGES.unshift({id:txId,item:desc,amount:parseFloat(amount),from:from,to:to,status:'Fonds sécurisés',date:dateStr,msg:msgStr,expires:expStr});
+  buildHistory();
+  showToast('✅ Transaction sécurisée · Vendeur notifié!');
+  appendLog({agent:'Ricci',color:'#C9A84C',msg:`a approuvé la nouvelle transaction ${txId}`});
+  appendLog({agent:'Bianka',color:'#4DFF90',msg:`a notifié le vendeur ${seller} par SMS`});
+  appendLog({agent:'Ada',color:'#5B9BFF',msg:`a sécurisé ${parseFloat(amount).toLocaleString('fr-FR')} FCFA en escrow`});
+  setTimeout(() => showScreen('history'), 1500);
+}
+
+// ═══════════════════════════════════════════════════════
+// TX DETAIL
+// ═══════════════════════════════════════════════════════
+function openTx(id, name, amount, from, to, seller, status, pct) {
+  const comm = Math.round(parseFloat(amount)*COMMISSION/100);
+  const net = parseFloat(amount)-comm;
+  showModal(`
+    <div class="modal-title">📦 Détails transaction</div>
+    <div class="modal-sub">${id}</div>
+    <div class="conf-row"><span>Article</span><span style="font-weight:700">${name}</span></div>
+    <div class="conf-row"><span>Trajet</span><span>${from} → ${to}</span></div>
+    <div class="conf-row"><span>Vendeur</span><span>${seller}</span></div>
+    <div class="conf-row"><span>Statut</span><span style="color:${status.includes('transit')?'#5B9BFF':status.includes('Complète')?'var(--gold-l)':'#00C851'}">${status}</span></div>
+    <div class="conf-row"><span>Montant escrow</span><span>${fmt(parseFloat(amount))}</span></div>
+    <div class="conf-row commission"><span>Commission (7%)</span><span style="color:var(--gold)">- ${fmt(comm)}</span></div>
+    <div class="conf-row"><span>Net vendeur</span><span style="color:#00C851">${fmt(net)}</span></div>
+    <div style="margin:12px 0">
+      <div style="font-size:10px;color:var(--muted);margin-bottom:4px">Progression</div>
+      <div class="pbar"><div class="pfill" style="width:${pct}%"></div></div>
+    </div>
+    <div style="background:var(--bg3);border-radius:10px;padding:10px;font-size:10px;color:var(--mid);line-height:1.5;margin-bottom:12px">
+      🤖 Agents en charge: <b style="color:var(--gold)">Ricci</b> (supervision) · <b style="color:#D880FF">Chouckette</b> (coordination) · <b style="color:#5B9BFF">Ada</b> (escrow)
+    </div>
+    ${pct < 100 ? `<button class="bigbtn" onclick="confirmReceipt('${id}','${net}')" style="font-size:13px;padding:12px;margin-bottom:8px">✅ Confirmer la réception → Libérer les fonds</button>` : ''}
+    <button onclick="closeModal()" style="width:100%;padding:11px;border-radius:12px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer">Fermer</button>
+  `);
+}
+
+function confirmReceipt(id, net) {
+  closeModal();
+  showToast('✅ Réception confirmée · Libération en cours…');
+  setTimeout(() => {
+    appendLog({agent:'Ricci',color:'#C9A84C',msg:`a autorisé la libération des fonds ${id}`});
+    appendLog({agent:'Ada',color:'#5B9BFF',msg:`a déverouillé et transféré ${parseFloat(net).toLocaleString('fr-FR')} FCFA au vendeur`});
+    appendLog({agent:'Bianka',color:'#4DFF90',msg:`a notifié vendeur et acheteur: transaction complète ✓`});
+    showToast('💸 ' + parseFloat(net).toLocaleString('fr-FR') + ' FCFA libérés au vendeur!');
+  }, 1500);
+}
+
+// ═══════════════════════════════════════════════════════
+// GPS
+// ═══════════════════════════════════════════════════════
+function activateGPS() {
+  if(!navigator.geolocation) { showToast('⚠️ GPS non disponible sur cet appareil'); return; }
+  showToast('📍 Activation GPS en cours…');
+  navigator.geolocation.getCurrentPosition(pos => {
+    gpsActive = true;
+    const dot = document.getElementById('userLocDot');
+    if(dot) {
+      dot.style.display = 'block';
+      dot.style.animation = 'gpsRipple 1.5s infinite';
+    }
+    showToast(`📍 Position GPS activée · Lat: ${pos.coords.latitude.toFixed(4)}`);
+    appendLog({agent:'Ada',color:'#5B9BFF',msg:`GPS utilisateur activé · Consentement accordé · Sécurisé`});
+  }, err => {
+    showToast('⚠️ Autorisation GPS refusée · Vérifiez les paramètres');
+  });
+}
+
+function deactivateGPS() {
+  gpsActive = false;
+  const dot = document.getElementById('userLocDot');
+  if(dot) dot.style.display = 'none';
+  showToast('⏹ GPS désactivé · Votre position n\'est plus partagée');
+  appendLog({agent:'Ada',color:'#5B9BFF',msg:'GPS utilisateur désactivé sur demande'});
+}
+
+// ═══════════════════════════════════════════════════════
+// SUPPORT
+// ═══════════════════════════════════════════════════════
+function submitTicket() {
+  const type = document.getElementById('ticket-type').value;
+  const name = document.getElementById('ticket-name').value;
+  const phone = document.getElementById('ticket-phone').value;
+  const msg = document.getElementById('ticket-msg').value;
+  if(!name||!phone||!msg) { showToast('⚠️ Renseignez tous les champs du ticket'); return; }
+  const num = '#TKT-' + (4600+Math.floor(Math.random()*100));
+  TICKETS.unshift({num,type,status:'En cours',time:'à l\'instant',agent:'Bianka'});
+  buildTickets();
+  document.getElementById('ticket-msg').value = '';
+  showToast('✉️ Ticket ' + num + ' envoyé · Bianka prend en charge');
+  appendLog({agent:'Bianka',color:'#4DFF90',msg:`a reçu nouveau ticket ${num} de ${name}`});
+}
+
+// ═══════════════════════════════════════════════════════
+// MODAL
+// ═══════════════════════════════════════════════════════
+function showModal(html) {
+  document.getElementById('modal-content').innerHTML = html;
+  document.getElementById('modal-bg').classList.add('show');
+}
+function closeModal(e) {
+  if(!e || e.target === document.getElementById('modal-bg') || !e.target) {
+    document.getElementById('modal-bg').classList.remove('show');
+  }
+}
+
+function agentClick(id) {
+  const a = AGENTS.find(ag=>ag.id===id);
+  if(!a) return;
+  showModal(`
+    <div style="text-align:center;margin-bottom:14px">
+      <div style="width:60px;height:60px;border-radius:50%;background:${a.avColor};border:2px solid ${a.borderColor};display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;color:${a.color};margin:0 auto 10px">${a.name[0]}</div>
+      <div style="font-size:17px;font-weight:800;color:${a.color}">${a.emoji} ${a.name}</div>
+      <div style="font-size:11px;color:var(--muted)">${a.role}</div>
+    </div>
+    <div style="background:var(--bg3);border-radius:10px;padding:12px;margin-bottom:12px">
+      <div style="font-size:10px;color:var(--muted);margin-bottom:6px">SPÉCIALISATION</div>
+      <div style="font-size:12px;color:var(--mid)">${a.spec}</div>
+    </div>
+    <div style="font-size:10px;color:var(--muted);margin-bottom:6px">TÂCHES EN COURS</div>
+    ${a.tasks.map(t=>`<div style="background:var(--bg3);border-radius:7px;padding:7px 10px;font-size:11px;color:rgba(255,255,255,0.7);border-left:2px solid ${a.borderColor};margin-bottom:5px">▸ ${t}</div>`).join('')}
+    <button onclick="closeModal()" style="width:100%;padding:11px;border-radius:12px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;margin-top:10px">Fermer</button>
+  `);
+}
+
+function showProfile() {
+  showModal(`
+    <div style="text-align:center;margin-bottom:14px">
+      <div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#3D2D00,#C9A84C);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:#fff;margin:0 auto 10px">JD</div>
+      <div style="font-size:16px;font-weight:800;color:var(--gold-l)">Jean Dupont</div>
+      <div style="font-size:11px;color:var(--muted)">Utilisateur E-CHANGER · Yaoundé</div>
+    </div>
+    <div class="conf-row"><span>Transactions</span><span>15 complètes</span></div>
+    <div class="conf-row"><span>Total sécurisé</span><span style="color:var(--gold-l)">1 245 000 FCFA</span></div>
+    <div class="conf-row"><span>Litiges</span><span style="color:#00C851">0</span></div>
+    <div class="conf-row"><span>Membre depuis</span><span>Janvier 2026</span></div>
+    <button onclick="closeModal()" style="width:100%;padding:11px;border-radius:12px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;margin-top:12px">Fermer</button>
+  `);
+}
+
+// ═══════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.opacity = '1';
+  t.style.transform = 'translateX(-50%) translateY(0)';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    t.style.opacity = '0';
+    t.style.transform = 'translateX(-50%) translateY(10px)';
+  }, 3200);
+}
+
+// ═══════════════════════════════════════════════════════
+// PWA MANIFEST
+// ═══════════════════════════════════════════════════════
+const manifest = {
+  name: 'E-CHANGER',
+  short_name: 'E-CHANGER',
+  description: 'Plateforme sécurisée de transactions au Cameroun',
+  start_url: '/',
+  display: 'standalone',
+  background_color: '#0A0A0F',
+  theme_color: '#C9A84C',
+  icons: [{src:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect width="192" height="192" rx="40" fill="%23C9A84C"/><text x="96" y="130" font-size="100" text-anchor="middle" fill="%230A0A0F" font-weight="900">E</text></svg>',sizes:'192x192',type:'image/svg+xml'}]
+};
+const blob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
+const url = URL.createObjectURL(blob);
+document.getElementById('manifest-link').href = url;
+
+// ═══════════════════════════════════════════════════════
+// LAUNCH
+// ═══════════════════════════════════════════════════════
+runSplash();
+</script>
+</body>
+</html>
